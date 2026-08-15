@@ -1,4 +1,5 @@
 import { Image } from 'expo-image';
+import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, { Keyframe, Easing } from 'react-native-reanimated';
 
@@ -6,7 +7,29 @@ import classes from './animated-icon.module.css';
 const DURATION = 300;
 
 export function AnimatedSplashOverlay() {
-  return null;
+  const [loaded, setLoaded] = useState(false);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    if (!loaded) return;
+
+    const timeout = window.setTimeout(() => setVisible(false), 2500);
+
+    return () => window.clearTimeout(timeout);
+  }, [loaded]);
+
+  if (!visible) return null;
+
+  return (
+    <View style={styles.splashOverlay}>
+      <Image
+        contentFit="cover"
+        onLoad={() => setLoaded(true)}
+        source={require('@/assets/images/kpop-studio-splash.jpg')}
+        style={styles.splashImage}
+      />
+    </View>
+  );
 }
 
 const keyframe = new Keyframe({
@@ -73,6 +96,15 @@ export function AnimatedIcon() {
 }
 
 const styles = StyleSheet.create({
+  splashOverlay: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: '#03000B',
+    zIndex: 1000,
+  },
+  splashImage: {
+    width: '100%',
+    height: '100%',
+  },
   container: {
     alignItems: 'center',
     width: '100%',

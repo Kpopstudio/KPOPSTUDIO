@@ -33,7 +33,13 @@ export function AnimatedSplashOverlay() {
     },
   });
 
-  const image = <Image style={styles.image} source={require('@/assets/images/expo-logo.png')} />;
+  const image = (
+    <Image
+      contentFit="cover"
+      style={styles.splashImage}
+      source={require('@/assets/images/kpop-studio-splash.jpg')}
+    />
+  );
 
   return animate ? (
     <Animated.View
@@ -131,6 +137,11 @@ const styles = StyleSheet.create({
     width: 76,
     height: 71,
   },
+  splashImage: {
+    ...StyleSheet.absoluteFill,
+    width: '100%',
+    height: '100%',
+  },
   background: {
     borderRadius: 40,
     experimental_backgroundImage: `linear-gradient(180deg, #3C9FFE, #0274DF)`,
@@ -140,7 +151,7 @@ const styles = StyleSheet.create({
   },
   splashOverlay: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: '#208AEF',
+    backgroundColor: '#03000B',
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 1000,
