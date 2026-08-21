@@ -4,3 +4,212 @@
   width: 128px;
   height: 128px;
 }
+
+.openingVisual,
+.kScene,
+.arenaScene,
+.arenaLayer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.openingVisual {
+  overflow: hidden;
+  background: #010006;
+}
+
+.openingVisualPaused,
+.openingVisualPaused * {
+  animation-play-state: paused !important;
+}
+
+.kScene {
+  z-index: 3;
+  opacity: 0;
+  animation:
+    k-scene-in var(--splash-fade-in) ease-out forwards,
+    k-scene-exit var(--splash-fade-out) cubic-bezier(0.65, 0, 0.35, 1) var(--splash-exit-delay) forwards;
+}
+
+.kShine {
+  position: absolute;
+  left: 32.4%;
+  top: 19.3%;
+  z-index: 4;
+  width: 36%;
+  height: 16%;
+  overflow: hidden;
+  pointer-events: none;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  -webkit-mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+}
+
+.kShine::before {
+  position: absolute;
+  top: -35%;
+  left: -55%;
+  width: 20%;
+  height: 170%;
+  content: '';
+  opacity: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.52),
+    rgba(255, 255, 255, 0.98),
+    rgba(216, 229, 255, 0.62),
+    transparent
+  );
+  filter: blur(0.7px) drop-shadow(0 0 9px rgba(235, 241, 255, 0.78));
+  mix-blend-mode: screen;
+  transform: skewX(-18deg);
+  animation: crystal-sweep 720ms cubic-bezier(0.32, 0, 0.18, 1) 230ms forwards;
+}
+
+@media (min-aspect-ratio: 11 / 20) {
+  .kShine {
+    top: 0;
+    height: 25%;
+  }
+}
+
+.arenaScene {
+  z-index: 2;
+  opacity: 0;
+  overflow: hidden;
+  background: #000;
+  animation: arena-black-in 1ms linear var(--arena-black-in-delay) forwards;
+  --crowd-reveal: 0;
+  --stage-reveal: 0;
+  --performer-reveal: 0;
+  --final-lights: 0;
+  --mask-width: 6%;
+  --mask-height: 5%;
+}
+
+.arenaLayer {
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.arenaBase {
+  opacity: 1;
+  filter: brightness(0) contrast(1.35) saturate(0.55);
+}
+
+.lightstickLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.lightstickPoint {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  opacity: 0;
+  background: rgba(238, 182, 255, 0.98);
+  box-shadow:
+    0 0 4px rgba(255, 221, 255, 0.98),
+    0 0 10px rgba(207, 83, 255, 0.9),
+    0 0 18px rgba(130, 48, 255, 0.58);
+  transition: filter 700ms ease-out;
+  animation: lightstick-breathe 4200ms ease-in-out infinite alternate;
+}
+
+.arenaReveal {
+  z-index: 2;
+  opacity: calc(0.18 + var(--crowd-reveal) * 0.82);
+  filter: brightness(calc(0.08 + var(--crowd-reveal) * 0.62 + var(--stage-reveal) * 0.18))
+    contrast(calc(1.32 - var(--crowd-reveal) * 0.22))
+    saturate(calc(0.68 + var(--stage-reveal) * 0.28));
+  mask-image: radial-gradient(ellipse at 50% 94%, #000 0%, rgba(0, 0, 0, 0.96) 24%, rgba(0, 0, 0, 0.7) 50%, rgba(0, 0, 0, 0.24) 75%, transparent 100%);
+  mask-position: 50% 92%;
+  mask-repeat: no-repeat;
+  mask-size: var(--mask-width) var(--mask-height);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 94%, #000 0%, rgba(0, 0, 0, 0.96) 24%, rgba(0, 0, 0, 0.7) 50%, rgba(0, 0, 0, 0.24) 75%, transparent 100%);
+  -webkit-mask-position: 50% 92%;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: var(--mask-width) var(--mask-height);
+  transform: scale(1.018);
+}
+
+.stageAtmosphere {
+  position: absolute;
+  inset: -18% -24% 18%;
+  z-index: 3;
+  pointer-events: none;
+  opacity: calc(var(--stage-reveal) * 0.56);
+  background: radial-gradient(ellipse at 50% 82%, rgba(179, 72, 255, 0.36) 0%, rgba(119, 38, 201, 0.18) 28%, rgba(66, 19, 115, 0.07) 52%, transparent 78%);
+  filter: blur(38px);
+  mix-blend-mode: screen;
+  transform: scale(calc(0.86 + var(--stage-reveal) * 0.18));
+}
+
+.arenaFinal {
+  z-index: 4;
+  pointer-events: none;
+  opacity: calc(var(--performer-reveal) * 0.42 + var(--final-lights) * 0.58);
+  filter: brightness(calc(0.72 + var(--final-lights) * 0.28)) saturate(calc(0.9 + var(--final-lights) * 0.1));
+}
+
+@keyframes crystal-sweep {
+  0% {
+    left: -55%;
+    opacity: 0;
+  }
+  16% {
+    opacity: 0.95;
+  }
+  82% {
+    opacity: 0.9;
+  }
+  100% {
+    left: 142%;
+    opacity: 0;
+  }
+}
+
+@keyframes k-scene-exit {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes k-scene-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes arena-black-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes lightstick-breathe {
+  from {
+    filter: brightness(0.88);
+  }
+  to {
+    filter: brightness(1.12);
+  }
+}

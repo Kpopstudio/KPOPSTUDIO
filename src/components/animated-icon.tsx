@@ -1,16 +1,41 @@
 import { Image } from 'expo-image';
 import * as SplashScreen from 'expo-splash-screen';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import Animated, { Easing, Keyframe } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
+
+import { OPENING_SCENE_DURATION_MS, useOpeningAudio } from '@/hooks/use-opening-audio.native';
+import { subscribeToOpeningReplay } from '@/utils/opening-replay';
 
 const INITIAL_SCALE_FACTOR = Dimensions.get('screen').height / 90;
 const DURATION = 600;
 
 export function AnimatedSplashOverlay() {
   const [animate, setAnimate] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const [visible, setVisible] = useState(true);
+  const [sequenceKey, setSequenceKey] = useState(0);
+  const { audioReady, restartOpeningAudio, startOpeningAudio } = useOpeningAudio();
+
+  useEffect(() => {
+    if (animate || !audioReady || !imageLoaded) return;
+    SplashScreen.hideAsync().finally(() => {
+      startOpeningAudio();
+      setAnimate(true);
+    });
+  }, [animate, audioReady, imageLoaded, startOpeningAudio]);
+
+  useEffect(
+    () =>
+      subscribeToOpeningReplay(() => {
+        restartOpeningAudio();
+        setSequenceKey((value) => value + 1);
+        setVisible(true);
+        setAnimate(true);
+      }),
+    [restartOpeningAudio]
+  );
 
   if (!visible) return null;
 
@@ -19,23 +44,20 @@ export function AnimatedSplashOverlay() {
       transform: [{ scale: 1 }],
       opacity: 1,
     },
-    20: {
+    97.6: {
       opacity: 1,
-    },
-    70: {
-      opacity: 0,
-      easing: Easing.elastic(0.7),
     },
     100: {
       opacity: 0,
       transform: [{ scale: 1 }],
-      easing: Easing.elastic(0.7),
+      easing: Easing.inOut(Easing.cubic),
     },
   });
 
   const image = (
     <Image
       contentFit="cover"
+      onLoad={() => setImageLoaded(true)}
       style={styles.splashImage}
       source={require('@/assets/images/kpop-studio-splash.jpg')}
     />
@@ -43,7 +65,8 @@ export function AnimatedSplashOverlay() {
 
   return animate ? (
     <Animated.View
-      entering={splashKeyframe.duration(DURATION).withCallback((finished) => {
+      key={sequenceKey}
+      entering={splashKeyframe.duration(OPENING_SCENE_DURATION_MS).withCallback((finished) => {
         'worklet';
         if (finished) {
           scheduleOnRN(setVisible, false);
@@ -53,13 +76,7 @@ export function AnimatedSplashOverlay() {
       {image}
     </Animated.View>
   ) : (
-    <View
-      onLayout={() => {
-        SplashScreen.hideAsync().finally(() => {
-          setAnimate(true);
-        });
-      }}
-      style={styles.splashOverlay}>
+    <View style={styles.splashOverlay}>
       {image}
     </View>
   );
